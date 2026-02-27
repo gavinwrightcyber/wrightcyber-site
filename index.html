@@ -4,76 +4,321 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Wright Cyber</title>
-  <meta name="description" content="Cybersecurity projects, labs, and write-ups." />
+  <meta name="description" content="SOC-style portfolio: labs, detections, automation, and write-ups." />
   <style>
-    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#0b0f16;color:#e6edf3}
+    :root{
+      --bg:#070a0f;
+      --panel:#0b1220;
+      --panel2:#0a1020;
+      --text:#dbe7ff;
+      --muted:#93a4c7;
+      --line:#1a2b4a;
+      --accent:#6cf5c2;
+      --accent2:#7aa2ff;
+      --warn:#ffd479;
+      --shadow: 0 10px 35px rgba(0,0,0,.55);
+      --radius:18px;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(800px 500px at 20% 10%, rgba(122,162,255,.10), transparent 60%),
+        radial-gradient(900px 600px at 80% 30%, rgba(108,245,194,.08), transparent 55%),
+        radial-gradient(700px 500px at 50% 90%, rgba(255,212,121,.06), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      font-family:var(--sans);
+      line-height:1.5;
+    }
     a{color:inherit}
-    .wrap{max-width:980px;margin:0 auto;padding:40px 20px}
-    .card{background:#101826;border:1px solid #1f2a3a;border-radius:16px;padding:20px;margin:16px 0}
-    .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
-    .tag{display:inline-block;border:1px solid #2b3a52;border-radius:999px;padding:6px 10px;margin:6px 6px 0 0;font-size:12px;color:#b7c3d6}
-    header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
-    nav a{margin-left:14px;opacity:.85;text-decoration:none}
-    nav a:hover{opacity:1;text-decoration:underline}
-    h1{margin:18px 0 6px;font-size:42px;letter-spacing:-.5px}
-    .muted{color:#b7c3d6}
-    footer{opacity:.7;margin-top:40px;font-size:13px}
-    .btn{display:inline-block;margin-top:14px;background:#1a2a44;border:1px solid #2b3a52;padding:10px 14px;border-radius:12px;text-decoration:none}
-    .btn:hover{filter:brightness(1.1)}
+    .wrap{max-width:1040px;margin:0 auto;padding:34px 18px 60px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+      position:sticky;top:0;padding:14px 0;backdrop-filter: blur(10px);
+    }
+    .brand{
+      display:flex;align-items:center;gap:10px;
+      font-family:var(--mono);
+      letter-spacing:.2px;
+    }
+    .dot{width:10px;height:10px;border-radius:999px;background:var(--accent);box-shadow:0 0 18px rgba(108,245,194,.55)}
+    nav a{
+      font-family:var(--mono);
+      text-decoration:none;
+      opacity:.85;
+      margin-left:14px;
+      padding:6px 10px;
+      border:1px solid transparent;
+      border-radius:10px;
+    }
+    nav a:hover{opacity:1;border-color:var(--line);background:rgba(26,43,74,.25)}
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap:16px;
+    }
+    @media (max-width: 900px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background:linear-gradient(180deg, rgba(11,18,32,.92), rgba(8,13,22,.92));
+      border:1px solid rgba(26,43,74,.9);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .card h2,.card h3{margin:0 0 10px}
+    .pad{padding:18px}
+    .mono{font-family:var(--mono)}
+    .muted{color:var(--muted)}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      font-family:var(--mono);
+      font-size:12px;
+      border:1px solid rgba(26,43,74,.9);
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(10,16,32,.75);
+      margin:6px 8px 0 0;
+      color:var(--muted);
+    }
+    .pill b{color:var(--text);font-weight:600}
+    .hero{
+      padding:0;
+      border-radius:var(--radius);
+    }
+    .terminal{
+      background:linear-gradient(180deg, rgba(10,16,32,.96), rgba(7,10,15,.96));
+      border:1px solid rgba(26,43,74,.9);
+      border-radius:var(--radius);
+      overflow:hidden;
+    }
+    .term-top{
+      display:flex;align-items:center;justify-content:space-between;
+      padding:10px 12px;
+      border-bottom:1px solid rgba(26,43,74,.9);
+      background:rgba(7,10,15,.55);
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+    }
+    .lights{display:flex;gap:8px;align-items:center}
+    .light{width:10px;height:10px;border-radius:999px;opacity:.9}
+    .r{background:#ff5f56}.y{background:#ffbd2e}.g{background:#27c93f}
+    .term-body{padding:16px 16px 18px;font-family:var(--mono);font-size:13px}
+    .line{display:flex;gap:10px;align-items:flex-start;margin:6px 0}
+    .prompt{color:var(--accent)}
+    .cmd{color:var(--text)}
+    .out{color:var(--muted)}
+    .k{color:var(--accent2)}
+    .w{color:var(--warn)}
+    .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    .btn{
+      display:inline-flex;align-items:center;gap:10px;
+      font-family:var(--mono);
+      font-size:13px;
+      text-decoration:none;
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(26,43,74,.9);
+      background:rgba(10,16,32,.75);
+    }
+    .btn:hover{filter:brightness(1.08)}
+    .btn .chev{opacity:.7}
+    .section-title{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      border-bottom:1px dashed rgba(26,43,74,.9);
+      padding-bottom:10px;margin-bottom:12px;
+    }
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:12px;
+    }
+    .mini{
+      border:1px solid rgba(26,43,74,.9);
+      border-radius:16px;
+      background:rgba(10,16,32,.55);
+      padding:14px;
+    }
+    .mini .t{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:6px}
+    .mini a{font-family:var(--mono);text-decoration:none}
+    .mini a:hover{text-decoration:underline}
+    .kv{display:grid;grid-template-columns:120px 1fr;gap:10px;margin:8px 0}
+    .kv .key{font-family:var(--mono);color:var(--muted);font-size:12px}
+    footer{margin-top:26px;color:var(--muted);font-family:var(--mono);font-size:12px;opacity:.85}
+    .blink{animation:blink 1.1s steps(1) infinite}
+    @keyframes blink{50%{opacity:0}}
   </style>
 </head>
 <body>
   <div class="wrap">
-    <header>
-      <div><strong>Wright Cyber</strong></div>
+    <div class="topbar">
+      <div class="brand">
+        <div class="dot"></div>
+        <div>wrightcyber<span class="muted">.com</span></div>
+      </div>
       <nav>
-        <a href="#projects">Projects</a>
-        <a href="#about">About</a>
-        <a href="#contact">Contact me</a>
+        <a href="#projects">projects</a>
+        <a href="#about">about</a>
+        <a href="#contact">contact</a>
       </nav>
-    </header>
+    </div>
 
-    <section class="card">
-      <h1>Cybersecurity projects and labs</h1>
-      <div class="muted">Hands-on work: networking, Windows Server/AD, cloud basics, and security labs.</div>
-      <div class="tag">Blue Team</div><div class="tag">Networking</div><div class="tag">Windows Server</div><div class="tag">Automation</div>
-      <a class="btn" href="#projects">View projects</a>
-    </section>
+    <div class="grid">
+      <div class="terminal hero">
+        <div class="term-top">
+          <div class="lights">
+            <span class="light r"></span><span class="light y"></span><span class="light g"></span>
+            <span style="margin-left:10px">SOC Console</span>
+          </div>
+          <div class="muted">status: <span style="color:var(--accent)">online</span></div>
+        </div>
+        <div class="term-body" aria-label="Terminal styled intro">
+          <div class="line"><span class="prompt">gavin@wrightcyber</span><span class="muted">:</span><span class="k">~</span><span class="muted">$</span><span class="cmd"> whoami</span></div>
+          <div class="line"><span class="out">Cybersecurity student / builder. Focus: blue team + labs + automation.</span></div>
 
-    <section id="projects" class="card">
-      <h2>Projects</h2>
-      <div class="grid">
-        <div class="card">
-          <strong>Project 1 (Coming soon)</strong>
-          <div class="muted">Short 1–2 line description.</div>
-        </div>
-        <div class="card">
-          <strong>Project 2 (Coming soon)</strong>
-          <div class="muted">Short 1–2 line description.</div>
-        </div>
-        <div class="card">
-          <strong>Project 3 (Coming soon)</strong>
-          <div class="muted">Short 1–2 line description.</div>
+          <div class="line"><span class="prompt">gavin@wrightcyber</span><span class="muted">:</span><span class="k">~</span><span class="muted">$</span><span class="cmd"> cat mission.txt</span></div>
+          <div class="line"><span class="out">Turn hands-on projects into proof: detections, hardening, and repeatable lab work.</span></div>
+
+          <div class="line"><span class="prompt">gavin@wrightcyber</span><span class="muted">:</span><span class="k">~</span><span class="muted">$</span><span class="cmd"> ls focus/</span></div>
+          <div class="line"><span class="out">windows-server/  active-directory/  networking/  incident-response/  automation/</span></div>
+
+          <div class="btnrow">
+            <a class="btn" href="#projects"><span class="chev">▶</span> view projects</a>
+            <a class="btn" href="mailto:gavin@wrightcyber.com"><span class="chev">✉</span> email</a>
+            <a class="btn" href="#" title="Add your resume PDF link later"><span class="chev">⬇</span> resume (soon)</a>
+          </div>
+
+          <div class="line" style="margin-top:14px"><span class="out">console ready<span class="blink">_</span></span></div>
         </div>
       </div>
-    </section>
 
-    <section id="about" class="card">
-      <h2>About</h2>
-      <div class="muted">
-        [Write 3–5 sentences about your focus, what you're building, and what roles you're targeting.]
+      <div class="card">
+        <div class="pad">
+          <div class="section-title">
+            <h2 class="mono" style="font-size:16px">quick facts</h2>
+            <span class="muted mono" style="font-size:12px">v0.1</span>
+          </div>
+
+          <div class="kv">
+            <div class="key">primary</div><div>blue team / SOC fundamentals</div>
+            <div class="key">stack</div><div>Windows Server, AD, GPO, Cisco CLI, Linux, basic Python</div>
+            <div class="key">domain</div><div>wrightcyber.com (Fastmail + Cloudflare)</div>
+          </div>
+
+          <div style="margin-top:10px">
+            <span class="pill"><b>MX</b> Fastmail</span>
+            <span class="pill"><b>SPF</b> enabled</span>
+            <span class="pill"><b>DKIM</b> enabled</span>
+            <span class="pill"><b>DMARC</b> quarantine 25%</span>
+            <span class="pill"><b>HTTPS</b> forced</span>
+            <span class="pill"><b>WWW</b> → root</span>
+          </div>
+        </div>
+
+        <div class="pad" style="border-top:1px solid rgba(26,43,74,.9)">
+          <div class="section-title">
+            <h3 class="mono" style="font-size:16px">next upgrades</h3>
+            <span class="muted mono" style="font-size:12px">placeholders</span>
+          </div>
+          <div class="cards">
+            <div class="mini">
+              <div class="t">project</div>
+              <div><strong>Home Lab: AD + Logging</strong></div>
+              <div class="muted">Build, harden, and document a small enterprise lab.</div>
+            </div>
+            <div class="mini">
+              <div class="t">project</div>
+              <div><strong>Incident Walkthrough</strong></div>
+              <div class="muted">Simulated phishing → investigation → report.</div>
+            </div>
+            <div class="mini">
+              <div class="t">project</div>
+              <div><strong>Automation</strong></div>
+              <div class="muted">Repeatable scripts/playbooks for common admin tasks.</div>
+            </div>
+          </div>
+        </div>
       </div>
-    </section>
+    </div>
 
-    <section id="contact" class="card">
-      <h2>Contact</h2>
-      <div class="muted">Email: <a href="mailto:gavin@wrightcyber.com">gavin@wrightcyber.com</a></div>
-      <div class="muted">LinkedIn: [add link]</div>
-      <div class="muted">GitHub: [add link]</div>
-    </section>
+    <div id="projects" class="card" style="margin-top:16px">
+      <div class="pad">
+        <div class="section-title">
+          <h2 class="mono">projects</h2>
+          <span class="muted mono">drop in real links as you build</span>
+        </div>
 
-    <footer>© <span id="y"></span> Wright Cyber</footer>
+        <div class="cards">
+          <div class="mini">
+            <div class="t">status: coming soon</div>
+            <div><strong>Ctrl+Alt+Defend Lab</strong></div>
+            <div class="muted">A student-friendly lab environment for monitoring and investigation.</div>
+            <div style="margin-top:10px"><a href="#">view write-up →</a></div>
+          </div>
+
+          <div class="mini">
+            <div class="t">status: coming soon</div>
+            <div><strong>Windows Hardening Checklist</strong></div>
+            <div class="muted">Practical settings mapped to common audit findings.</div>
+            <div style="margin-top:10px"><a href="#">view checklist →</a></div>
+          </div>
+
+          <div class="mini">
+            <div class="t">status: coming soon</div>
+            <div><strong>Networking Lab: VLANs + Routing</strong></div>
+            <div class="muted">VLAN segmentation, routing, and verification steps.</div>
+            <div style="margin-top:10px"><a href="#">view diagrams →</a></div>
+          </div>
+
+          <div class="mini">
+            <div class="t">status: coming soon</div>
+            <div><strong>Write-ups</strong></div>
+            <div class="muted">Short posts: what broke, what I fixed, and what I learned.</div>
+            <div style="margin-top:10px"><a href="#">browse posts →</a></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="about" class="card" style="margin-top:16px">
+      <div class="pad">
+        <div class="section-title">
+          <h2 class="mono">about</h2>
+        </div>
+        <p class="muted">
+          Replace this with 4–6 sentences: what you’re studying, what kind of roles you want,
+          and what you’re building to prove it. Keep it simple and direct.
+        </p>
+        <div class="pill"><b>email</b> gavin@wrightcyber.com</div>
+        <div class="pill"><b>github</b> add link</div>
+        <div class="pill"><b>linkedin</b> add link</div>
+      </div>
+    </div>
+
+    <div id="contact" class="card" style="margin-top:16px">
+      <div class="pad">
+        <div class="section-title">
+          <h2 class="mono">contact</h2>
+        </div>
+        <div class="kv">
+          <div class="key">email</div>
+          <div><a class="mono" href="mailto:gavin@wrightcyber.com">gavin@wrightcyber.com</a></div>
+          <div class="key">github</div>
+          <div class="mono">[your profile link]</div>
+          <div class="key">linkedin</div>
+          <div class="mono">https://github.com/gavinwrightcyber</div>
+        </div>
+      </div>
+    </div>
+
+    <footer>© <span id="y"></span> wrightcyber.com</footer>
   </div>
-  <script>document.getElementById("y").textContent=new Date().getFullYear();</script>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+  </script>
 </body>
 </html>
