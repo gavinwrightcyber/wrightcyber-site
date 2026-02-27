@@ -237,24 +237,9 @@
               <span class="muted mono" style="font-size:12px">manual log</span>
             </div>
 
-            <ul class="list">
-              <li class="li">
-                <span><span class="muted">[today]</span> domain + email stack live</span>
-                <span class="badge">done</span>
-              </li>
-              <li class="li">
-                <span><span class="muted">next</span> publish first project write-up</span>
-                <span class="badge">queued</span>
-              </li>
-              <li class="li">
-                <span><span class="muted">next</span> add resume PDF + link</span>
-                <span class="badge">queued</span>
-              </li>
-              <li class="li">
-                <span><span class="muted">next</span> lab diagram (AD + logging)</span>
-                <span class="badge">queued</span>
-              </li>
-            </ul>
+<ul class="list" id="activity-feed">
+  <li class="li"><span class="muted">loading activity…</span><span class="badge">wait</span></li>
+</ul>
 
             <div style="margin-top:10px" class="muted mono">
               tip: update these lines when you finish something — it keeps the site looking alive.
@@ -397,5 +382,19 @@
   <script>
     document.getElementById("y").textContent = new Date().getFullYear();
   </script>
+
+<script>
+  document.getElementById("y").textContent = new Date().getFullYear();
+
+  // Load activity items from /activity.html so you can update it without hunting through index.html
+  fetch("/activity.html", { cache: "no-store" })
+    .then(r => r.ok ? r.text() : Promise.reject(r.status))
+    .then(html => { document.getElementById("activity-feed").innerHTML = html; })
+    .catch(() => {
+      document.getElementById("activity-feed").innerHTML =
+        '<li class="li"><span class="muted">activity feed unavailable</span><span class="badge">err</span></li>';
+    });
+</script>
+  
 </body>
 </html>
