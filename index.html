@@ -8,8 +8,6 @@
   <style>
     :root{
       --bg:#070a0f;
-      --panel:#0b1220;
-      --panel2:#0a1020;
       --text:#dbe7ff;
       --muted:#93a4c7;
       --line:#1a2b4a;
@@ -95,10 +93,7 @@
     .pill b{color:var(--text);font-weight:600}
 
     /* Left column stack */
-    .leftcol{
-      display:grid;
-      gap:16px;
-    }
+    .leftcol{display:grid;gap:16px}
 
     /* Terminal */
     .terminal{
@@ -106,6 +101,7 @@
       border:1px solid rgba(26,43,74,.9);
       border-radius:var(--radius);
       overflow:hidden;
+      box-shadow:var(--shadow);
     }
     .term-top{
       display:flex;align-items:center;justify-content:space-between;
@@ -125,7 +121,6 @@
     .cmd{color:var(--text)}
     .out{color:var(--muted)}
     .k{color:var(--accent2)}
-    .w{color:var(--warn)}
     .btnrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
     .btn{
       display:inline-flex;align-items:center;gap:10px;
@@ -229,7 +224,7 @@
           </div>
         </div>
 
-        <!-- NEW: Activity / Status panel to fill space -->
+        <!-- Activity / Status panel -->
         <div class="card">
           <div class="pad">
             <div class="section-title">
@@ -237,19 +232,13 @@
               <span class="muted mono" style="font-size:12px">manual log</span>
             </div>
 
-<ul class="list" id="activity-feed">
-  <li class="li"><span class="muted">loading activity…</span><span class="badge">wait</span></li>
-</ul>
+            <!-- This loads from /activity.html so you can update it without editing index.html -->
+            <ul class="list" id="activity-feed">
+              <li class="li"><span class="muted">loading activity…</span><span class="badge">wait</span></li>
+            </ul>
 
             <div style="margin-top:10px" class="muted mono">
-              tip: update these lines when you finish something — it keeps the site looking alive.
-            </div>
-          </div>
-        </div>
-
-            <div class="kv" style="margin-top:12px">
-              <div class="key">now</div><div>build 1–2 “proof” projects with clean write-ups</div>
-              <div class="key">soon</div><div>start small detection content (logs → findings → fixes)</div>
+              tip: edit <span class="mono">activity.html</span> in the repo to update this feed.
             </div>
           </div>
         </div>
@@ -368,7 +357,6 @@
           <div class="key">email</div>
           <div><a class="mono" href="mailto:gavin@wrightcyber.com">gavin@wrightcyber.com</a></div>
           <div class="key">github</div>
-          <!-- keeping your clickable link exactly as you added it -->
           <div><a class="mono" href="https://github.com/gavinwrightcyber" target="_blank" rel="noopener noreferrer">github.com/gavinwrightcyber</a></div>
           <div class="key">linkedin</div>
           <div class="mono">[your profile link]</div>
@@ -381,20 +369,15 @@
 
   <script>
     document.getElementById("y").textContent = new Date().getFullYear();
+
+    // Load activity items from /activity.html
+    fetch("/activity.html", { cache: "no-store" })
+      .then(r => r.ok ? r.text() : Promise.reject(r.status))
+      .then(html => { document.getElementById("activity-feed").innerHTML = html; })
+      .catch(() => {
+        document.getElementById("activity-feed").innerHTML =
+          '<li class="li"><span class="muted">activity feed unavailable</span><span class="badge">err</span></li>';
+      });
   </script>
-
-<script>
-  document.getElementById("y").textContent = new Date().getFullYear();
-
-  // Load activity items from /activity.html so you can update it without hunting through index.html
-  fetch("/activity.html", { cache: "no-store" })
-    .then(r => r.ok ? r.text() : Promise.reject(r.status))
-    .then(html => { document.getElementById("activity-feed").innerHTML = html; })
-    .catch(() => {
-      document.getElementById("activity-feed").innerHTML =
-        '<li class="li"><span class="muted">activity feed unavailable</span><span class="badge">err</span></li>';
-    });
-</script>
-  
 </body>
 </html>
