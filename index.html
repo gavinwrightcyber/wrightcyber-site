@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Wright Cyber</title>
+  <meta name="description" content="Cybersecurity projects, labs, and write-ups." />
+  <style>
+    body{margin:0;font-family:system-ui,Segoe UI,Roboto,Arial;background:#0b0f16;color:#e6edf3}
+    a{color:inherit}
+    .wrap{max-width:980px;margin:0 auto;padding:40px 20px}
+    .card{background:#101826;border:1px solid #1f2a3a;border-radius:16px;padding:20px;margin:16px 0}
+    .grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+    .tag{display:inline-block;border:1px solid #2b3a52;border-radius:999px;padding:6px 10px;margin:6px 6px 0 0;font-size:12px;color:#b7c3d6}
+    header{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap}
+    nav a{margin-left:14px;opacity:.85;text-decoration:none}
+    nav a:hover{opacity:1;text-decoration:underline}
+    h1{margin:18px 0 6px;font-size:42px;letter-spacing:-.5px}
+    .muted{color:#b7c3d6}
+    footer{opacity:.7;margin-top:40px;font-size:13px}
+    .btn{display:inline-block;margin-top:14px;background:#1a2a44;border:1px solid #2b3a52;padding:10px 14px;border-radius:12px;text-decoration:none}
+    .btn:hover{filter:brightness(1.1)}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div><strong>Wright Cyber</strong></div>
+      <nav>
+        <a href="#projects">Projects</a>
+        <a href="#about">About</a>
+        <a href="#contact">Contact</a>
+      </nav>
+    </header>
+
+    <section class="card">
+      <h1>Cybersecurity projects and labs</h1>
+      <div class="muted">Hands-on work: networking, Windows Server/AD, cloud basics, and security labs.</div>
+      <div class="tag">Blue Team</div><div class="tag">Networking</div><div class="tag">Windows Server</div><div class="tag">Automation</div>
+      <a class="btn" href="#projects">View projects</a>
+    </section>
+
+    <section id="projects" class="card">
+      <h2>Projects</h2>
+      <div class="grid">
+        <div class="card">
+          <strong>Project 1 (Coming soon)</strong>
+          <div class="muted">Short 1–2 line description.</div>
+        </div>
+        <div class="card">
+          <strong>Project 2 (Coming soon)</strong>
+          <div class="muted">Short 1–2 line description.</div>
+        </div>
+        <div class="card">
+          <strong>Project 3 (Coming soon)</strong>
+          <div class="muted">Short 1–2 line description.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="card">
+      <h2>About</h2>
+      <div class="muted">
+        [Write 3–5 sentences about your focus, what you're building, and what roles you're targeting.]
+      </div>
+    </section>
+
+    <section id="contact" class="card">
+      <h2>Contact</h2>
+      <div class="muted">Email: <a href="mailto:gavin@wrightcyber.com">gavin@wrightcyber.com</a></div>
+      <div class="muted">LinkedIn: [add link]</div>
+      <div class="muted">GitHub: [add link]</div>
+    </section>
+
+    <footer>© <span id="y"></span> Wright Cyber</footer>
+  </div>
+  <script>document.getElementById("y").textContent=new Date().getFullYear();</script>
+</body>
+</html>
