@@ -140,15 +140,23 @@
 
     .list{margin:0;padding:0;list-style:none}
     .li{
-      display:flex;justify-content:space-between;gap:14px;
-      padding:10px 0;border-bottom:1px solid rgba(42,36,80,.55);
-      font-family:var(--mono);font-size:12px;
+      display:grid;
+      grid-template-columns: 1fr auto;
+      align-items:start;
+      gap:14px;
+      padding:10px 0;
+      border-bottom:1px solid rgba(42,36,80,.55);
+      font-family:var(--mono);
+      font-size:12px;
     }
     .li:last-child{border-bottom:none}
     .badge{
+      display:inline-block;
+      align-self:start;
+      height:fit-content;
       font-family:var(--mono);
       font-size:11px;
-      padding:4px 8px;
+      padding:4px 10px;
       border-radius:999px;
       border:1px solid rgba(42,36,80,.95);
       background:rgba(12,10,24,.72);
