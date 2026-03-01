@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Projects | Wright Cyber</title>
+  <meta name="description" content="Infrastructure projects: AD lab, automation, troubleshooting logbook." />
+  <style>
+    /* same style as index (kept self-contained for static hosting) */
+    :root{--bg:#070a10;--text:#e9e6ff;--muted:#b3a9e6;--line:#2a2450;--accent:#b58bff;--accent2:#7a5cff;--glow:rgba(181,139,255,.45);--shadow:0 10px 35px rgba(0,0,0,.55);--radius:18px;--mono:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;--sans:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
+    *{box-sizing:border-box} body{margin:0;background:radial-gradient(800px 520px at 20% 10%, rgba(181,139,255,.12), transparent 60%),radial-gradient(900px 620px at 80% 30%, rgba(122,92,255,.10), transparent 55%),radial-gradient(700px 520px at 50% 90%, rgba(255,255,255,.05), transparent 60%),var(--bg);color:var(--text);font-family:var(--sans);line-height:1.5}
+    a{color:inherit} .wrap{max-width:1060px;margin:0 auto;padding:34px 18px 60px}
+    .topbar{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;position:sticky;top:0;padding:14px 0;backdrop-filter: blur(10px)}
+    .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);letter-spacing:.2px}
+    .dot{width:10px;height:10px;border-radius:999px;background:var(--accent);box-shadow:0 0 18px var(--glow)}
+    nav a{font-family:var(--mono);text-decoration:none;opacity:.88;margin-left:14px;padding:6px 10px;border:1px solid transparent;border-radius:10px}
+    nav a:hover{opacity:1;border-color:var(--line);background:rgba(42,36,80,.25)}
+    .card{background:linear-gradient(180deg, rgba(14,12,28,.92), rgba(9,8,18,.92));border:1px solid rgba(42,36,80,.95);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}
+    .pad{padding:18px} .mono{font-family:var(--mono)} .muted{color:var(--muted)}
+    .section-title{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;border-bottom:1px dashed rgba(42,36,80,.95);padding-bottom:10px;margin-bottom:12px}
+    .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+    .mini{border:1px solid rgba(42,36,80,.95);border-radius:16px;background:rgba(12,10,24,.55);padding:14px}
+    .mini .t{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:6px}
+    .mini a{font-family:var(--mono);text-decoration:none} .mini a:hover{text-decoration:underline}
+    .btn{display:inline-flex;align-items:center;gap:10px;font-family:var(--mono);font-size:13px;text-decoration:none;padding:10px 12px;border-radius:14px;border:1px solid rgba(42,36,80,.95);background:rgba(12,10,24,.72)}
+    .btn:hover{filter:brightness(1.08)} .btn .chev{opacity:.75}
+    footer{margin-top:26px;color:var(--muted);font-family:var(--mono);font-size:12px;opacity:.9}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand"><div class="dot"></div><div>wrightcyber<span class="muted">.com</span></div></div>
+      <nav>
+        <a href="/">home</a>
+        <a href="/projects/">projects</a>
+        <a href="/journal/">journal</a>
+        <a href="/about/">about</a>
+        <a href="/contact/">contact</a>
+      </nav>
+    </div>
+
+    <div class="card">
+      <div class="pad">
+        <div class="section-title">
+          <h1 class="mono" style="margin:0;font-size:20px">projects</h1>
+          <span class="muted mono">build → validate → document</span>
+        </div>
+
+        <div class="cards">
+          <div class="mini">
+            <div class="t">status: in progress</div>
+            <div><strong>Active Directory Lab (Centerpiece)</strong></div>
+            <div class="muted">DC01 + joined clients/servers, baseline GPO, DNS/DHCP choices, and a clean build guide.</div>
+            <div style="margin-top:10px" class="muted mono">page: coming soon</div>
+          </div>
+
+          <div class="mini">
+            <div class="t">status: in progress</div>
+            <div><strong>Automation: Patch + Compliance (Ansible)</strong></div>
+            <div class="muted">Ubuntu control node + Windows/Linux targets, patching playbooks, and basic health/compliance output.</div>
+            <div style="margin-top:10px" class="muted mono">page: coming soon</div>
+          </div>
+
+          <div class="mini">
+            <div class="t">status: in progress</div>
+            <div><strong>Troubleshooting Logbook + Runbooks</strong></div>
+            <div class="muted">10+ lab tickets with evidence, fixes, and prevention steps (short, readable entries).</div>
+            <div style="margin-top:10px" class="muted mono">page: coming soon</div>
+          </div>
+        </div>
+
+        <div style="margin-top:16px">
+          <a class="btn" href="/journal/"><span class="chev">▶</span> see progress in the journal</a>
+          <a class="btn" href="/resume.pdf"><span class="chev">⬇</span> resume</a>
+        </div>
+      </div>
+    </div>
+
+    <footer>© <span id="y"></span> wrightcyber.com</footer>
+  </div>
+  <script>document.getElementById("y").textContent=new Date().getFullYear();</script>
+</body>
+</html>
