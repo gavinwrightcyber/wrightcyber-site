@@ -1,0 +1,625 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AD Lab | Wright Cyber</title>
+  <meta name="description" content="Active Directory lab build: DC01 + WS01 + SRV01, baseline GPO, file shares, and permissions." />
+  <style>
+    :root{
+      --bg:#070a10;
+      --text:#e9e6ff;
+      --muted:#b3a9e6;
+      --line:#2a2450;
+
+      --accent:#b58bff;
+      --accent2:#7a5cff;
+      --glow: rgba(181,139,255,.45);
+
+      --shadow: 0 10px 35px rgba(0,0,0,.55);
+      --radius:18px;
+
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;
+      --sans: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      background:
+        radial-gradient(800px 520px at 20% 10%, rgba(181,139,255,.12), transparent 60%),
+        radial-gradient(900px 620px at 80% 30%, rgba(122,92,255,.10), transparent 55%),
+        radial-gradient(700px 520px at 50% 90%, rgba(255,255,255,.05), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      font-family:var(--sans);
+      line-height:1.6;
+    }
+    a{color:inherit}
+    .wrap{max-width:1060px;margin:0 auto;padding:34px 18px 60px}
+    .topbar{
+      display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+      position:sticky;top:0;padding:14px 0;backdrop-filter: blur(10px);
+    }
+    .brand{display:flex;align-items:center;gap:10px;font-family:var(--mono);letter-spacing:.2px}
+    .dot{width:10px;height:10px;border-radius:999px;background:var(--accent);box-shadow:0 0 18px var(--glow)}
+    nav a{
+      font-family:var(--mono);
+      text-decoration:none;
+      opacity:.88;
+      margin-left:14px;
+      padding:6px 10px;
+      border:1px solid transparent;
+      border-radius:10px;
+    }
+    nav a:hover{opacity:1;border-color:var(--line);background:rgba(42,36,80,.25)}
+
+    .card{
+      background:linear-gradient(180deg, rgba(14,12,28,.92), rgba(9,8,18,.92));
+      border:1px solid rgba(42,36,80,.95);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      overflow:hidden;
+    }
+    .pad{padding:18px}
+    .mono{font-family:var(--mono)}
+    .muted{color:var(--muted)}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      font-family:var(--mono);
+      font-size:12px;
+      border:1px solid rgba(42,36,80,.95);
+      padding:6px 10px;
+      border-radius:999px;
+      background:rgba(12,10,24,.72);
+      margin:6px 8px 0 0;
+      color:var(--muted);
+      white-space:nowrap;
+    }
+    .pill b{color:var(--text);font-weight:600}
+    .section-title{
+      display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;
+      border-bottom:1px dashed rgba(42,36,80,.95);
+      padding-bottom:10px;margin-bottom:12px;
+    }
+    .hero h1{margin:0 0 8px;font-size:26px;letter-spacing:-.3px}
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 330px;
+      gap:16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+
+    /* TOC (appendix) */
+    .toc{
+      position:sticky;
+      top:74px;
+    }
+    .toc a{
+      display:block;
+      font-family:var(--mono);
+      font-size:12px;
+      text-decoration:none;
+      opacity:.9;
+      padding:8px 10px;
+      border:1px solid rgba(42,36,80,.55);
+      border-radius:12px;
+      background:rgba(12,10,24,.40);
+      margin-bottom:8px;
+    }
+    .toc a:hover{
+      opacity:1;
+      border-color:rgba(181,139,255,.55);
+      background:rgba(12,10,24,.65);
+    }
+
+    .table{
+      width:100%;
+      border-collapse:collapse;
+      overflow:hidden;
+      border-radius:14px;
+      border:1px solid rgba(42,36,80,.95);
+      background:rgba(12,10,24,.40);
+    }
+    .table th,.table td{
+      text-align:left;
+      padding:10px 12px;
+      border-bottom:1px solid rgba(42,36,80,.55);
+      font-family:var(--mono);
+      font-size:12px;
+      vertical-align:top;
+    }
+    .table th{color:var(--muted);font-weight:600}
+    .table tr:last-child td{border-bottom:none}
+
+    .callout{
+      border:1px solid rgba(181,139,255,.35);
+      background:rgba(181,139,255,.07);
+      border-radius:14px;
+      padding:12px;
+      font-family:var(--mono);
+      font-size:12px;
+      color:var(--muted);
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+      gap:12px;
+    }
+    .mini{
+      border:1px solid rgba(42,36,80,.95);
+      border-radius:16px;
+      background:rgba(12,10,24,.55);
+      padding:14px;
+    }
+    .mini .t{font-family:var(--mono);font-size:12px;color:var(--muted);margin-bottom:6px}
+
+    .list{margin:0;padding:0;list-style:none}
+    .li{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      align-items:start;
+      gap:14px;
+      padding:10px 0;
+      border-bottom:1px solid rgba(42,36,80,.55);
+      font-family:var(--mono);
+      font-size:12px;
+    }
+    .li:last-child{border-bottom:none}
+    .badge{
+      display:inline-block;
+      align-self:start;
+      height:fit-content;
+      font-family:var(--mono);
+      font-size:11px;
+      padding:4px 10px;
+      border-radius:999px;
+      border:1px solid rgba(42,36,80,.95);
+      background:rgba(12,10,24,.72);
+      color:var(--muted);
+      white-space:nowrap;
+    }
+
+    .jump{scroll-margin-top:90px}
+
+    footer{margin-top:26px;color:var(--muted);font-family:var(--mono);font-size:12px;opacity:.9}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand"><div class="dot"></div><div>wrightcyber<span class="muted">.com</span></div></div>
+      <nav>
+        <a href="/">home</a>
+        <a href="/projects/">projects</a>
+        <a href="/about/">about</a>
+        <a href="/contact/">contact</a>
+      </nav>
+    </div>
+
+    <div class="card hero">
+      <div class="pad">
+        <h1>Active Directory Lab (Centerpiece)</h1>
+        <div class="muted">
+          Domain build + baseline GPO + file server shares/permissions. Built to mirror real-world Windows infrastructure.
+        </div>
+        <div style="margin-top:10px">
+          <span class="pill"><b>domain</b> ad.wrightcyber.lab</span>
+          <span class="pill"><b>netbios</b> WRIGHTCYBER</span>
+          <span class="pill"><b>dc</b> Windows Server 2022</span>
+          <span class="pill"><b>vms</b> DC01 / WS01 / SRV01</span>
+          <span class="pill"><b>network</b> Hyper-V NAT</span>
+          <span class="pill"><b>status</b> in progress</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid" style="margin-top:16px">
+      <!-- MAIN CONTENT -->
+      <div>
+        <div class="card jump" id="overview">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">overview</h2>
+              <span class="muted mono">what this proves</span>
+            </div>
+
+            <div class="cards">
+              <div class="mini">
+                <div class="t">skills</div>
+                <div class="muted">
+                  AD DS + DNS deployment, domain join workflow, OU/group design (AGDLP), baseline GPO, SMB shares + NTFS permissions, validation + troubleshooting.
+                </div>
+              </div>
+              <div class="mini">
+                <div class="t">deliverables</div>
+                <div class="muted">
+                  A working domain, repeatable build steps, evidence screenshots, and a troubleshooting log. Later: downloadable summary PDF.
+                </div>
+              </div>
+            </div>
+
+            <div class="callout" style="margin-top:12px">
+              This project is the foundation for the rest of the lab. The automation and troubleshooting projects will build on this environment.
+            </div>
+          </div>
+        </div>
+
+        <div class="card jump" id="topology" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">topology</h2>
+              <span class="muted mono">vm inventory</span>
+            </div>
+
+            <div class="muted" style="margin-bottom:12px">
+              Diagram coming soon. For now, here’s the VM inventory and roles.
+            </div>
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Host</th>
+                  <th>OS</th>
+                  <th>Role</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>DC01</td>
+                  <td>Windows Server 2022 Standard</td>
+                  <td>Domain Controller (AD DS) + DNS</td>
+                  <td>Authoritative DNS for ad.wrightcyber.lab</td>
+                </tr>
+                <tr>
+                  <td>WS01</td>
+                  <td>Windows 11</td>
+                  <td>Domain-joined client</td>
+                  <td>Used for GPO validation and access testing</td>
+                </tr>
+                <tr>
+                  <td>SRV01</td>
+                  <td>Windows Server 2022 Standard</td>
+                  <td>Member server / File server</td>
+                  <td>SMB shares + NTFS permissions (AGDLP)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="callout" style="margin-top:12px">
+              Networking: Hyper-V NAT switch so VMs can reach the internet for updates while staying isolated from the home network.
+            </div>
+          </div>
+        </div>
+
+        <div class="card jump" id="objectives" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">objectives</h2>
+              <span class="muted mono">definition of done</span>
+            </div>
+
+            <ul class="list">
+              <li class="li"><span>DC01 promoted, AD DS + DNS healthy</span><span class="badge">core</span></li>
+              <li class="li"><span>WS01 joined to domain, domain users can log in</span><span class="badge">core</span></li>
+              <li class="li"><span>SRV01 joined, file shares created</span><span class="badge">core</span></li>
+              <li class="li"><span>OU structure + users/groups created (AGDLP)</span><span class="badge">core</span></li>
+              <li class="li"><span>Baseline GPO applied and verified (gpresult/RSOP)</span><span class="badge">core</span></li>
+              <li class="li"><span>End-to-end access test: correct access + denied access proof</span><span class="badge">proof</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card jump" id="build-plan" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">build plan</h2>
+              <span class="muted mono">phases</span>
+            </div>
+
+            <div class="cards">
+              <div class="mini">
+                <div class="t">phase 1</div>
+                <strong>Hyper-V networking + VM builds</strong>
+                <div class="muted">NAT vSwitch, create DC01/WS01/SRV01, baseline OS installs.</div>
+              </div>
+              <div class="mini">
+                <div class="t">phase 2</div>
+                <strong>DC01 promote (AD DS + DNS)</strong>
+                <div class="muted">Create forest: ad.wrightcyber.lab, verify DNS + AD health.</div>
+              </div>
+              <div class="mini">
+                <div class="t">phase 3</div>
+                <strong>Join WS01 + SRV01</strong>
+                <div class="muted">Set client DNS to DC01, join domain, validate login.</div>
+              </div>
+              <div class="mini">
+                <div class="t">phase 4</div>
+                <strong>OUs + users + groups (AGDLP)</strong>
+                <div class="muted">Create standard departments, groups, and role-based access model.</div>
+              </div>
+              <div class="mini">
+                <div class="t">phase 5</div>
+                <strong>Baseline GPO</strong>
+                <div class="muted">Password/lockout, RDP policy, basic auditing, update policy (later).</div>
+              </div>
+              <div class="mini">
+                <div class="t">phase 6</div>
+                <strong>File server shares + permissions</strong>
+                <div class="muted">SRV01 shares + NTFS, validate access and denied access.</div>
+              </div>
+              <div class="mini">
+                <div class="t">phase 7</div>
+                <strong>Validation + evidence capture</strong>
+                <div class="muted">Screenshots, commands used, and troubleshooting notes.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card jump" id="naming-ip" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">naming + ip plan</h2>
+              <span class="muted mono">standards</span>
+            </div>
+
+            <div class="callout">
+              Domain: <span class="mono">ad.wrightcyber.lab</span> • NetBIOS: <span class="mono">WRIGHTCYBER</span><br/>
+              VM names: <span class="mono">DC01</span>, <span class="mono">WS01</span>, <span class="mono">SRV01</span><br/>
+              DNS rule: domain members point to <span class="mono">DC01</span> for DNS (common join/trust issues come from wrong DNS).
+            </div>
+
+            <div class="muted" style="margin-top:10px">
+              IP plan will be documented once the vSwitch subnet is finalized. (NAT vSwitch keeps this isolated.)
+            </div>
+          </div>
+        </div>
+
+        <div class="card jump" id="ad-design" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">ad design</h2>
+              <span class="muted mono">ou + group strategy</span>
+            </div>
+
+            <div class="muted" style="margin-bottom:10px">
+              Department-driven OU layout with AGDLP group model for scalable permissions.
+            </div>
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Area</th>
+                  <th>Standard</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>OUs</td>
+                  <td>Workstations, Servers, Users, Groups, Admins</td>
+                  <td>Keep policy targets clean (WS vs Servers vs Users)</td>
+                </tr>
+                <tr>
+                  <td>Accounts</td>
+                  <td>Separate admin accounts (after build)</td>
+                  <td>Use a “build” account initially; create admin accounts before hardening</td>
+                </tr>
+                <tr>
+                  <td>Groups</td>
+                  <td>AGDLP</td>
+                  <td>Accounts → Global Groups → Domain Local Groups → Permissions</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card jump" id="gpo" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">gpo baseline</h2>
+              <span class="muted mono">policy + verification</span>
+            </div>
+
+            <div class="cards">
+              <div class="mini">
+                <div class="t">account policies</div>
+                <strong>Password + lockout</strong>
+                <div class="muted">Set domain password policy and lockout threshold; verify on WS01.</div>
+              </div>
+              <div class="mini">
+                <div class="t">remote access</div>
+                <strong>RDP restrictions</strong>
+                <div class="muted">Limit RDP to an admin group; validate denied access with standard user.</div>
+              </div>
+              <div class="mini">
+                <div class="t">audit</div>
+                <strong>Basic auditing</strong>
+                <div class="muted">Enable core audit categories; prove events are generated in Event Viewer.</div>
+              </div>
+            </div>
+
+            <div class="callout" style="margin-top:12px">
+              Verification method: <span class="mono">gpresult /r</span> or RSOP on WS01 + screenshot of applied policies.
+            </div>
+          </div>
+        </div>
+
+        <div class="card jump" id="fileserver" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">file server + permissions</h2>
+              <span class="muted mono">SRV01 • AGDLP</span>
+            </div>
+
+            <div class="muted" style="margin-bottom:10px">
+              Goal: realistic SMB shares + NTFS permissions using AGDLP (scales cleanly).
+            </div>
+
+            <table class="table">
+              <thead>
+                <tr>
+                  <th>Department</th>
+                  <th>Global Group (Users)</th>
+                  <th>Domain Local Group (Permission)</th>
+                  <th>Share/NTFS</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>HR</td>
+                  <td>GG_HR_Users</td>
+                  <td>DL_HR_RW</td>
+                  <td>\\SRV01\HR (Modify)</td>
+                </tr>
+                <tr>
+                  <td>Finance</td>
+                  <td>GG_FIN_Users</td>
+                  <td>DL_FIN_RW</td>
+                  <td>\\SRV01\Finance (Modify)</td>
+                </tr>
+                <tr>
+                  <td>IT</td>
+                  <td>GG_IT_Users</td>
+                  <td>DL_IT_RW</td>
+                  <td>\\SRV01\IT (Modify)</td>
+                </tr>
+                <tr>
+                  <td>All Staff</td>
+                  <td>GG_All_Users</td>
+                  <td>DL_Public_RW</td>
+                  <td>\\SRV01\Public (Modify)</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div class="callout" style="margin-top:12px">
+              Proof plan: log into WS01 as an HR user → access HR share ✓ → attempt Finance share ✗ (screenshot denied).
+            </div>
+          </div>
+        </div>
+
+        <div class="card jump" id="validation" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">validation & proof</h2>
+              <span class="muted mono">screenshots to capture</span>
+            </div>
+
+            <ul class="list">
+              <li class="li"><span>DC01 promotion success (Server Manager / AD DS)</span><span class="badge">screenshot</span></li>
+              <li class="li"><span>DNS resolution working (nslookup internal names)</span><span class="badge">screenshot</span></li>
+              <li class="li"><span>WS01 domain join success + domain login</span><span class="badge">screenshot</span></li>
+              <li class="li"><span>GPO applied proof (gpresult / RSOP)</span><span class="badge">screenshot</span></li>
+              <li class="li"><span>SRV01 shares created + permissions view</span><span class="badge">screenshot</span></li>
+              <li class="li"><span>Access allowed + denied access evidence</span><span class="badge">screenshot</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="card jump" id="troubleshooting" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">troubleshooting log</h2>
+              <span class="muted mono">short entries</span>
+            </div>
+
+            <div class="muted">Add issues as they happen. Keep it: Symptom → Cause → Fix → Prevention.</div>
+
+            <div class="cards" style="margin-top:12px">
+              <div class="mini">
+                <div class="t">placeholder</div>
+                <strong>Domain join fails</strong>
+                <div class="muted">Likely cause: client DNS points to router instead of DC01.</div>
+              </div>
+              <div class="mini">
+                <div class="t">placeholder</div>
+                <strong>Kerberos / time skew</strong>
+                <div class="muted">Likely cause: time difference between client and DC.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card jump" id="build-log" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">build log</h2>
+              <span class="muted mono">updates</span>
+            </div>
+
+            <ul class="list" id="ad-log">
+              <li class="li"><span class="muted">loading…</span><span class="badge">wait</span></li>
+            </ul>
+
+            <div class="muted mono" style="margin-top:10px;font-size:12px">
+              tip: edit <span class="mono">/projects/ad-lab/log.html</span> to update this section.
+            </div>
+          </div>
+        </div>
+
+        <div class="card jump" id="downloads" style="margin-top:16px">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:16px">downloads</h2>
+              <span class="muted mono">optional</span>
+            </div>
+
+            <ul class="list">
+              <li class="li"><span>AD Lab Summary PDF</span><span class="badge">coming soon</span></li>
+              <li class="li"><span>Topology diagram image</span><span class="badge">coming soon</span></li>
+              <li class="li"><span>GPO backup/export</span><span class="badge">later</span></li>
+            </ul>
+          </div>
+        </div>
+
+        <footer>© <span id="y"></span> wrightcyber.com</footer>
+      </div>
+
+      <!-- APPENDIX / TOC -->
+      <div class="toc">
+        <div class="card">
+          <div class="pad">
+            <div class="section-title">
+              <h2 class="mono" style="margin:0;font-size:14px">appendix</h2>
+              <span class="muted mono">jump</span>
+            </div>
+            <a href="#overview">overview</a>
+            <a href="#topology">topology</a>
+            <a href="#objectives">objectives</a>
+            <a href="#build-plan">build plan</a>
+            <a href="#naming-ip">naming + ip plan</a>
+            <a href="#ad-design">ad design</a>
+            <a href="#gpo">gpo baseline</a>
+            <a href="#fileserver">file server + permissions</a>
+            <a href="#validation">validation & proof</a>
+            <a href="#troubleshooting">troubleshooting log</a>
+            <a href="#build-log">build log</a>
+            <a href="#downloads">downloads</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    fetch("/projects/ad-lab/log.html", { cache: "no-store" })
+      .then(r => r.ok ? r.text() : Promise.reject(r.status))
+      .then(html => {
+        const el = document.getElementById("ad-log");
+        if (el) el.innerHTML = html;
+      })
+      .catch(() => {
+        const el = document.getElementById("ad-log");
+        if (el) el.innerHTML =
+          '<li class="li"><span class="muted">log unavailable</span><span class="badge">err</span></li>';
+      });
+  </script>
+</body>
+</html>
