@@ -6,6 +6,68 @@
   <title>AD Lab | Wright Cyber</title>
   <meta name="description" content="Active Directory lab build: DC01 + WS01 + SRV01, baseline GPO, file shares, and permissions." />
   <style>
+
+    .log{display:grid;gap:10px}
+
+.entry{
+  border:1px solid rgba(42,36,80,.95);
+  border-radius:16px;
+  background:rgba(12,10,24,.55);
+  overflow:hidden;
+}
+.entry summary{
+  list-style:none;
+  cursor:pointer;
+  padding:12px 14px;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:12px;
+  align-items:center;
+  font-family:var(--mono);
+  font-size:12px;
+}
+.entry summary::-webkit-details-marker{display:none}
+.entry summary:hover{
+  background:rgba(12,10,24,.75);
+}
+
+.entry .date{color:var(--muted);white-space:nowrap}
+.entry .title{color:var(--text)}
+.entry .status{
+  border:1px solid rgba(42,36,80,.95);
+  background:rgba(12,10,24,.72);
+  color:var(--muted);
+  border-radius:999px;
+  padding:4px 10px;
+  font-size:11px;
+  white-space:nowrap;
+}
+.entry .status.queued{
+  border-color: rgba(181,139,255,.45);
+  color: var(--text);
+}
+
+.entry[open] summary{
+  border-bottom:1px solid rgba(42,36,80,.55);
+  background:rgba(12,10,24,.75);
+}
+
+.entry .body{
+  padding:12px 14px 14px;
+  color:var(--muted);
+  font-family:var(--sans);
+  font-size:14px;
+}
+.entry .body h4{
+  margin:10px 0 6px;
+  font-family:var(--mono);
+  font-size:12px;
+  color:var(--text);
+}
+.entry .body ul{margin:6px 0 0 18px}
+.entry .body p{margin:6px 0 0}
+.entry .body a{color:var(--text);text-decoration:underline}
+    
     :root{
       --bg:#070a10;
       --text:#e9e6ff;
@@ -615,11 +677,10 @@
         const el = document.getElementById("ad-log");
         if (el) el.innerHTML = html;
       })
-      .catch(() => {
-        const el = document.getElementById("ad-log");
-        if (el) el.innerHTML =
-          '<li class="li"><span class="muted">log unavailable</span><span class="badge">err</span></li>';
-      });
+.catch(() => {
+  const el = document.getElementById("ad-log");
+  if (el) el.innerHTML = '<div class="muted mono">log unavailable</div>';
+});
   </script>
 </body>
 </html>
